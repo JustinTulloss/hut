@@ -43,8 +43,12 @@ func NewService() *Service {
 func (s *Service) Start() {
 	http.Handle("/", handlers.CombinedLoggingHandler(os.Stdout, s.Router))
 
+	port, err := s.Env.GetString("port")
+	if err != nil {
+		log.Fatal("Could not get port to start on: ", err)
+	}
 	// Actually start the server
-	port := fmt.Sprintf(":%s", os.Getenv("PORT"))
+	port = fmt.Sprintf(":%s", port)
 	log.Printf("Server started on %s\n", port)
 	log.Fatal(http.ListenAndServe(port, nil))
 }
