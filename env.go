@@ -17,24 +17,28 @@ type Env interface {
 // Reads the environment from the OS environment
 type OsEnv struct{}
 
+func getenv(key string) string {
+	return os.Getenv(strings.ToUpper(key))
+}
+
 func (e *OsEnv) Get(key string) (interface{}, error) {
 	return e.GetString(key)
 }
 
 func (*OsEnv) GetString(key string) (string, error) {
-	return os.Getenv(key), nil
+	return getenv(key), nil
 }
 
 func (*OsEnv) GetUint(key string) (uint64, error) {
-	return strconv.ParseUint(os.Getenv(key), 10, 64)
+	return strconv.ParseUint(getenv(key), 10, 64)
 }
 
 func (*OsEnv) GetInt(key string) (int64, error) {
-	return strconv.ParseInt(os.Getenv(key), 10, 64)
+	return strconv.ParseInt(getenv(key), 10, 64)
 }
 
 func (e *OsEnv) InProd() bool {
-	return strings.ToLower(os.Getenv("ENV")) != "prod"
+	return strings.ToLower(os.Getenv("ENV")) == "prod"
 }
 
 func NewOsEnv() *OsEnv {
