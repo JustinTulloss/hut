@@ -11,6 +11,13 @@ import (
 	"github.com/gorilla/mux"
 )
 
+type Params map[string]interface{}
+
+type Request struct {
+	HttpRequest *http.Request
+	Params      *Params
+}
+
 type Service struct {
 	Router *mux.Router
 	Env    Env
@@ -32,14 +39,22 @@ func (s *Service) defaultHandler(w http.ResponseWriter, r *http.Request) {
 	s.Reply(rep, w)
 }
 
-func NewService() *Service {
-	r := mux.NewRouter()
+// Optionally you can pass in a router to the service in order to instantiate
+// it somewhere down the routing chaing. By default, the service assumes it's
+// the root.
+func NewService(r *mux.Router) *Service {
+	if r == nil {
+		r = mux.NewRouter()
+	}
 	// Default to OsEnv until we have more ways of doing configuration
 	service := &Service{Router: r, Env: NewOsEnv()}
-	r.HandleFunc("/", service.defaultHandler)
+	r.HandleFunc("/health", service.defaultHandler)
 	return service
 }
 
+// Starts this service running on a port specified in the env.
+// Note that it's not necessary to call start if this service is going to be
+// served by a different service.
 func (s *Service) Start() {
 	http.Handle("/", handlers.CombinedLoggingHandler(os.Stdout, s.Router))
 
