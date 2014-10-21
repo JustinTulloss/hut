@@ -11,13 +11,6 @@ import (
 	"github.com/gorilla/mux"
 )
 
-type Params map[string]interface{}
-
-type Request struct {
-	HttpRequest *http.Request
-	Params      *Params
-}
-
 type Service struct {
 	Router *mux.Router
 	Env    Env
