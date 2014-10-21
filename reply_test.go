@@ -56,7 +56,7 @@ var _ = Describe("Replies", func() {
 			s.SuccessReply(nil, w)
 			Expect(w.Code).To(Equal(http.StatusOK))
 			rep := unmarshalBody(w.Body)
-			Expect(len(rep)).To(Equal(1))
+			Expect(rep).To(HaveLen(1))
 			Expect(rep["status"]).To(Equal("OK"))
 		})
 		It("Sends back standard message with provided metadata", func() {
@@ -67,7 +67,7 @@ var _ = Describe("Replies", func() {
 			s.SuccessReply(payload, w)
 			Expect(w.Code).To(Equal(http.StatusOK))
 			rep := unmarshalBody(w.Body)
-			Expect(len(rep)).To(Equal(3))
+			Expect(rep).To(HaveLen(3))
 			Expect(rep["status"]).To(Equal("OK"))
 			for k, v := range payload {
 				Expect(rep[k]).To(Equal(v))
@@ -80,8 +80,8 @@ var _ = Describe("Replies", func() {
 			s.ErrorReply(myErr, w)
 			Expect(w.Code).To(Equal(http.StatusInternalServerError))
 			rep := unmarshalBody(w.Body)
-			Expect(int(rep["code"].(float64))).To(Equal(http.StatusInternalServerError))
-			Expect(rep["message"]).ToNot(BeNil())
+			Expect(rep).To(HaveKeyWithValue("code", float64(http.StatusInternalServerError)))
+			Expect(rep).To(HaveKey("message"))
 		})
 	})
 	Describe("HttpError", func() {
@@ -90,8 +90,8 @@ var _ = Describe("Replies", func() {
 			Expect(w.Code).To(Equal(http.StatusGone))
 			Expect(w.Header().Get("Content-Type")).To(Equal(jsonContentType))
 			rep := unmarshalBody(w.Body)
-			Expect(rep["message"]).To(Equal("things are bad"))
-			Expect(rep["code"]).To(Equal(float64(http.StatusGone)))
+			Expect(rep).To(HaveKeyWithValue("message", "things are bad"))
+			Expect(rep).To(HaveKeyWithValue("code", float64(http.StatusGone)))
 		})
 	})
 	Describe("NotFound", func() {
@@ -99,7 +99,7 @@ var _ = Describe("Replies", func() {
 			s.NotFound(w)
 			Expect(w.Code).To(Equal(http.StatusNotFound))
 			rep := unmarshalBody(w.Body)
-			Expect(rep["code"]).To(Equal(float64(http.StatusNotFound)))
+			Expect(rep).To(HaveKeyWithValue("code", float64(http.StatusNotFound)))
 		})
 	})
 })
