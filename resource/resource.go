@@ -1,6 +1,7 @@
 package resource
 
 import (
+	"encoding/json"
 	"log"
 	"strconv"
 	"strings"
@@ -39,6 +40,35 @@ type Node interface {
 	Path() *Path
 }
 
+type Collection struct {
+	path  *Path
+	items []*Path
+}
+
+func (c *Collection) Path() *Path {
+	return c.path
+}
+
+func (c *Collection) Append(paths ...*Path) {
+	c.items = append(c.items, paths...)
+}
+
+func (c *Collection) Add(nodes ...Node) {
+	paths := make([]*Path, len(nodes))
+	for i, n := range nodes {
+		paths[i] = n.Path()
+	}
+	c.Append(paths...)
+}
+
+func (c *Collection) MarshalJSON() ([]byte, error) {
+	return json.Marshal(c.items)
+}
+
+func NewCollection(path *Path, items ...*Path) *Collection {
+	return &Collection{path, items}
+}
+
 type Resources map[*Path]Node
 
 func (r Resources) Serializable() map[string]interface{} {
@@ -47,4 +77,10 @@ func (r Resources) Serializable() map[string]interface{} {
 		serializable[k.String()] = v
 	}
 	return serializable
+}
+
+func (r Resources) Add(nodes ...Node) {
+	for _, n := range nodes {
+		r[n.Path()] = n
+	}
 }
