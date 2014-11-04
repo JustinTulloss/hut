@@ -36,11 +36,15 @@ func (s *Service) defaultHandler(w http.ResponseWriter, r *http.Request) {
 // it somewhere down the routing chaing. By default, the service assumes it's
 // the root.
 func NewService(r *mux.Router) *Service {
+	var service *Service
 	if r == nil {
 		r = mux.NewRouter()
+		r.NotFoundHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			service.NotFound(w)
+		})
 	}
 	// Default to OsEnv until we have more ways of doing configuration
-	service := &Service{Router: r, Env: NewOsEnv()}
+	service = &Service{Router: r, Env: NewOsEnv()}
 	r.HandleFunc("/health", service.defaultHandler)
 	return service
 }
