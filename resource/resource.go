@@ -16,6 +16,8 @@ func NewPath(nodes ...interface{}) *Path {
 	path := Path{}
 	for _, n := range nodes {
 		switch n.(type) {
+		case *uint64:
+			path = append(path, strconv.FormatUint(*n.(*uint64), 10))
 		case uint64:
 			path = append(path, strconv.FormatUint(n.(uint64), 10))
 		case string:
@@ -27,7 +29,17 @@ func NewPath(nodes ...interface{}) *Path {
 	return &path
 }
 
-type Resources map[*Path]interface{}
+type Edge interface {
+	Get() Node
+	Path() *Path
+	Link()
+}
+
+type Node interface {
+	Path() *Path
+}
+
+type Resources map[*Path]Node
 
 func (r Resources) Serializable() map[string]interface{} {
 	serializable := map[string]interface{}{}
