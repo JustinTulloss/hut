@@ -31,7 +31,7 @@ func NewPath(nodes ...interface{}) *Path {
 }
 
 type Edge interface {
-	Get() Node
+	Get() (Node, error)
 	Path() *Path
 	Link()
 }
@@ -81,6 +81,23 @@ func (r Resources) Serializable() map[string]interface{} {
 
 func (r Resources) Add(nodes ...Node) {
 	for _, n := range nodes {
-		r[n.Path()] = n
+		switch node := n.(type) {
+		case Edge:
+			newNode, err := node.Get()
+			if err == nil {
+				r.Add(newNode)
+				node.Link()
+			}
+		case Node:
+			if node != nil && node.Path() != nil {
+				r[node.Path()] = node
+			}
+		}
 	}
+}
+
+func NewResources(nodes ...Node) Resources {
+	r := Resources{}
+	r.Add(nodes...)
+	return r
 }
