@@ -65,6 +65,9 @@ func (c *Collection) MarshalJSON() ([]byte, error) {
 }
 
 func NewCollection(path *Path, items ...*Path) *Collection {
+	if items == nil {
+		items = []*Path{}
+	}
 	return &Collection{path, items}
 }
 
