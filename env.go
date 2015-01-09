@@ -1,6 +1,7 @@
 package hut
 
 import (
+	"errors"
 	"os"
 	"strconv"
 	"strings"
@@ -43,4 +44,42 @@ func (e *OsEnv) InProd() bool {
 
 func NewOsEnv() *OsEnv {
 	return &OsEnv{}
+}
+
+type MapEnv map[string]interface{}
+
+func (e MapEnv) Get(key string) (interface{}, error) {
+	return e[key], nil
+}
+
+func (e MapEnv) GetString(key string) (string, error) {
+	s, ok := e[key].(string)
+	if !ok {
+		return "", errors.New(key + " is not a string")
+	}
+	return s, nil
+}
+
+func (e MapEnv) GetUint(key string) (uint64, error) {
+	n, ok := e[key].(uint64)
+	if !ok {
+		return 0, errors.New(key + " is not a uint64")
+	}
+	return n, nil
+}
+
+func (e MapEnv) GetInt(key string) (int64, error) {
+	n, ok := e[key].(int64)
+	if !ok {
+		return 0, errors.New(key + " is not a int64")
+	}
+	return n, nil
+}
+
+func (e MapEnv) InProd() bool {
+	return e["ENV"].(string) == "prod"
+}
+
+func NewMapEnv() MapEnv {
+	return MapEnv{}
 }
