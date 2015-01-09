@@ -9,7 +9,7 @@ import (
 )
 
 var db *sqlx.DB
-var firebaseishRe = regexp.MustCompile("^https://firebase")
+var firebaseishRe = regexp.MustCompile(`^https://.*\.firebaseio`)
 
 func (s *Service) NewDbClient(driver string) (*sqlx.DB, error) {
 	if db != nil {

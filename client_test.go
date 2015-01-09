@@ -13,7 +13,7 @@ var _ = Describe("clients", func() {
 	BeforeEach(func() {
 		s = hut.NewService(nil)
 		s.Env = hut.MapEnv{
-			"FIREBASE_URL":  "https://firebase-not-real",
+			"FIREBASE_URL":  "https://not-real.firebaseio",
 			"FIREBASE_AUTH": "fake-auth",
 		}
 	})
