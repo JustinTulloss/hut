@@ -14,6 +14,7 @@ import (
 type Service struct {
 	Router *mux.Router
 	Env    Env
+	Log    Log
 }
 
 // This serves as a health check and a default route just to make sure we're
@@ -44,7 +45,7 @@ func NewService(r *mux.Router) *Service {
 		})
 	}
 	// Default to OsEnv until we have more ways of doing configuration
-	service = &Service{Router: r, Env: NewOsEnv()}
+	service = &Service{Router: r, Env: NewOsEnv(), Log: NewStdLog()}
 	r.HandleFunc("/health", service.defaultHandler)
 	return service
 }
