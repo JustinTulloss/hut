@@ -26,7 +26,7 @@ func (s *Service) NewDbClient(driver string) (*sqlx.DB, error) {
 	return conn, nil
 }
 
-func (s *Service) NewFirebaseClient() (*firebase.Client, error) {
+func (s *Service) NewFirebaseClient() (firebase.Client, error) {
 	baseUrl, err := s.Env.GetString("FIREBASE_URL")
 	if err != nil {
 		return nil, err
