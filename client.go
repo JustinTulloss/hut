@@ -1,11 +1,13 @@
 package hut
 
 import (
+	"fmt"
 	"errors"
 	"regexp"
 
 	"github.com/JustinTulloss/firebase"
 	"github.com/jmoiron/sqlx"
+	"github.com/garyburd/redigo/redis"
 )
 
 var db *sqlx.DB
@@ -40,3 +42,32 @@ func (s *Service) NewFirebaseClient() (firebase.Client, error) {
 	}
 	return firebase.NewClient(baseUrl, authToken, nil), nil
 }
+
+
+func (s *Service) NewRedisClient() (redis.Conn, *redis.PubSubConn, error) {
+	redisTcpAddr, err := s.Env.GetString("REDIS_PORT_6379_TCP_ADDR")
+	if err != nil {
+		return nil, nil, err
+	}
+	redisPort, err := s.Env.GetString("REDIS_PORT_6379_TCP_PORT")
+	if err != nil {
+		return nil, nil, err
+	}
+	redisAddress := fmt.Sprintf(
+		"%s:%s",
+		redisTcpAddr,
+		redisPort,
+	)
+	c, err := redis.Dial("tcp", redisAddress)
+	if err != nil {
+		return nil, nil, err
+	}
+	subscribeConn := &redis.PubSubConn{c}
+
+	publishConn, err := redis.Dial("tcp", redisAddress)
+	if err != nil {
+		return nil, nil, err
+	}
+	return publishConn, subscribeConn, err
+}
+
