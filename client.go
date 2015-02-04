@@ -44,14 +44,14 @@ func (s *Service) NewFirebaseClient() (firebase.Client, error) {
 }
 
 
-func (s *Service) NewRedisClient() (redis.Conn, *redis.PubSubConn, error) {
+func (s *Service) NewRedisClient() (redis.Conn, error) {
 	redisTcpAddr, err := s.Env.GetString("REDIS_PORT_6379_TCP_ADDR")
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 	redisPort, err := s.Env.GetString("REDIS_PORT_6379_TCP_PORT")
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 	redisAddress := fmt.Sprintf(
 		"%s:%s",
@@ -60,14 +60,8 @@ func (s *Service) NewRedisClient() (redis.Conn, *redis.PubSubConn, error) {
 	)
 	c, err := redis.Dial("tcp", redisAddress)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
-	subscribeConn := &redis.PubSubConn{c}
-
-	publishConn, err := redis.Dial("tcp", redisAddress)
-	if err != nil {
-		return nil, nil, err
-	}
-	return publishConn, subscribeConn, err
+	return c, nil
 }
 
