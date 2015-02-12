@@ -1,17 +1,16 @@
 package hut
 
 import (
-	"errors"
 	"os"
 	"strconv"
 	"strings"
 )
 
 type Env interface {
-	Get(string) (interface{}, error)
-	GetString(string) (string, error)
-	GetUint(string) (uint64, error)
-	GetInt(string) (int64, error)
+	Get(string) interface{}
+	GetString(string) string
+	GetUint(string) uint64
+	GetInt(string) int64
 	InProd() bool
 }
 
@@ -22,20 +21,28 @@ func getenv(key string) string {
 	return os.Getenv(strings.ToUpper(key))
 }
 
-func (e *OsEnv) Get(key string) (interface{}, error) {
+func (e *OsEnv) Get(key string) interface{} {
 	return e.GetString(key)
 }
 
-func (*OsEnv) GetString(key string) (string, error) {
-	return getenv(key), nil
+func (*OsEnv) GetString(key string) string {
+	return getenv(key)
 }
 
-func (*OsEnv) GetUint(key string) (uint64, error) {
-	return strconv.ParseUint(getenv(key), 10, 64)
+func (*OsEnv) GetUint(key string) uint64 {
+	val, err := strconv.ParseUint(getenv(key), 10, 64)
+	if err != nil {
+		panic("Could not parse " + key)
+	}
+	return val
 }
 
-func (*OsEnv) GetInt(key string) (int64, error) {
-	return strconv.ParseInt(getenv(key), 10, 64)
+func (*OsEnv) GetInt(key string) int64 {
+	val, err := strconv.ParseInt(getenv(key), 10, 64)
+	if err != nil {
+		panic("Could not parse " + key)
+	}
+	return val
 }
 
 func (e *OsEnv) InProd() bool {
@@ -48,32 +55,32 @@ func NewOsEnv() *OsEnv {
 
 type MapEnv map[string]interface{}
 
-func (e MapEnv) Get(key string) (interface{}, error) {
-	return e[key], nil
+func (e MapEnv) Get(key string) interface{} {
+	return e[key]
 }
 
-func (e MapEnv) GetString(key string) (string, error) {
+func (e MapEnv) GetString(key string) string {
 	s, ok := e[key].(string)
 	if !ok {
-		return "", errors.New(key + " is not a string")
+		panic("Could not find " + key + " in env")
 	}
-	return s, nil
+	return s
 }
 
-func (e MapEnv) GetUint(key string) (uint64, error) {
+func (e MapEnv) GetUint(key string) uint64 {
 	n, ok := e[key].(uint64)
 	if !ok {
-		return 0, errors.New(key + " is not a uint64")
+		panic("Could not get " + key + " as a uint")
 	}
-	return n, nil
+	return n
 }
 
-func (e MapEnv) GetInt(key string) (int64, error) {
+func (e MapEnv) GetInt(key string) int64 {
 	n, ok := e[key].(int64)
 	if !ok {
-		return 0, errors.New(key + " is not a int64")
+		panic("Could not get " + key + " as an int")
 	}
-	return n, nil
+	return n
 }
 
 func (e MapEnv) InProd() bool {

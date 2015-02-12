@@ -1,13 +1,13 @@
 package hut
 
 import (
-	"fmt"
 	"errors"
+	"fmt"
 	"regexp"
 
 	"github.com/JustinTulloss/firebase"
-	"github.com/jmoiron/sqlx"
 	"github.com/garyburd/redigo/redis"
+	"github.com/jmoiron/sqlx"
 )
 
 var db *sqlx.DB
@@ -17,10 +17,7 @@ func (s *Service) NewDbClient(driver string) (*sqlx.DB, error) {
 	if db != nil {
 		return db, nil
 	}
-	dbUrl, err := s.Env.GetString("database_url")
-	if err != nil {
-		return nil, err
-	}
+	dbUrl := s.Env.GetString("database_url")
 	conn, err := sqlx.Connect(driver, dbUrl)
 	if err != nil {
 		return nil, err
@@ -29,30 +26,17 @@ func (s *Service) NewDbClient(driver string) (*sqlx.DB, error) {
 }
 
 func (s *Service) NewFirebaseClient() (firebase.Client, error) {
-	baseUrl, err := s.Env.GetString("FIREBASE_URL")
-	if err != nil {
-		return nil, err
-	}
+	baseUrl := s.Env.GetString("FIREBASE_URL")
 	if !firebaseishRe.MatchString(baseUrl) {
 		return nil, errors.New(baseUrl + " does not appear to be a firebase url")
 	}
-	authToken, err := s.Env.GetString("FIREBASE_AUTH")
-	if err != nil {
-		return nil, err
-	}
+	authToken := s.Env.GetString("FIREBASE_AUTH")
 	return firebase.NewClient(baseUrl, authToken, nil), nil
 }
 
-
 func (s *Service) NewRedisClient() (redis.Conn, error) {
-	redisTcpAddr, err := s.Env.GetString("REDIS_PORT_6379_TCP_ADDR")
-	if err != nil {
-		return nil, err
-	}
-	redisPort, err := s.Env.GetString("REDIS_PORT_6379_TCP_PORT")
-	if err != nil {
-		return nil, err
-	}
+	redisTcpAddr := s.Env.GetString("REDIS_PORT_6379_TCP_ADDR")
+	redisPort := s.Env.GetString("REDIS_PORT_6379_TCP_PORT")
 	redisAddress := fmt.Sprintf(
 		"%s:%s",
 		redisTcpAddr,
@@ -64,4 +48,3 @@ func (s *Service) NewRedisClient() (redis.Conn, error) {
 	}
 	return c, nil
 }
-

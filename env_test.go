@@ -27,8 +27,7 @@ var _ = Describe("OsEnv", func() {
 		}
 	})
 	It("Can get configuration", func() {
-		val, err := s.Env.Get("TEST")
-		Expect(err).ToNot(HaveOccurred())
+		val := s.Env.Get("TEST")
 		Expect(val.(string)).To(Equal("secrets, maybe"))
 	})
 	It("can get strings", func() {
@@ -37,14 +36,12 @@ var _ = Describe("OsEnv", func() {
 	It("Can get uints", func() {
 		os.Setenv("NUMBERS", "1234")
 		Expect(s.Env.GetUint("NUMBERS")).To(Equal(uint64(1234)))
-		_, err := s.Env.GetUint("TEST")
-		Expect(err).To(HaveOccurred())
+		Expect(func() { s.Env.GetUint("TEST") }).To(Panic())
 	})
 	It("Can get ints", func() {
 		os.Setenv("NUMBERS", "5678")
 		Expect(s.Env.GetInt("NUMBERS")).To(Equal(int64(5678)))
-		_, err := s.Env.GetInt("TEST")
-		Expect(err).To(HaveOccurred())
+		Expect(func() { s.Env.GetInt("TEST") }).To(Panic())
 	})
 	It("says we're in prod if the environment does", func() {
 		Expect(s.Env.InProd()).To(BeFalse())
