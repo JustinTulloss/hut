@@ -56,10 +56,7 @@ func NewService(r *mux.Router) *Service {
 func (s *Service) Start() {
 	http.Handle("/", handlers.CombinedLoggingHandler(os.Stdout, s.Router))
 
-	port, err := s.Env.GetString("port")
-	if err != nil {
-		log.Fatal("Could not get port to start on: ", err)
-	}
+	port := s.Env.GetString("port")
 	// Actually start the server
 	port = fmt.Sprintf(":%s", port)
 	log.Printf("Server started on %s\n", port)
