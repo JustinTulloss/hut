@@ -43,6 +43,16 @@ var _ = Describe("OsEnv", func() {
 		Expect(s.Env.GetInt("NUMBERS")).To(Equal(int64(5678)))
 		Expect(func() { s.Env.GetInt("TEST") }).To(Panic())
 	})
+	It("can compose a tcp service address", func() {
+		os.Setenv("SERVICE_PORT_1337_TCP_ADDR", "testerator")
+		os.Setenv("SERVICE_PORT_1337_TCP_PORT", "7")
+		Expect(s.Env.GetTCPServiceAddress("service", 1337)).To(Equal("testerator:7"))
+	})
+	It("can compose a udp service address", func() {
+		os.Setenv("SERVICE_PORT_1337_UDP_ADDR", "testerator")
+		os.Setenv("SERVICE_PORT_1337_UDP_PORT", "7")
+		Expect(s.Env.GetUDPServiceAddress("service", 1337)).To(Equal("testerator:7"))
+	})
 	It("says we're in prod if the environment does", func() {
 		Expect(s.Env.InProd()).To(BeFalse())
 		os.Setenv("ENV", "prod")

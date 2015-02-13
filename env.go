@@ -1,6 +1,7 @@
 package hut
 
 import (
+	"fmt"
 	"os"
 	"strconv"
 	"strings"
@@ -11,12 +12,25 @@ type Env interface {
 	GetString(string) string
 	GetUint(string) uint64
 	GetInt(string) int64
+	GetTCPServiceAddress(string, int) string
+	GetUDPServiceAddress(string, int) string
 	InProd() bool
 }
 
 // Reads the environment from the OS environment
 type OsEnv struct{}
 
+// Given a docker link like name, pull the connection details out of the
+// environment. https://docs.docker.com/userguide/dockerlinks/#environment-variables
+func makeDockerLinkAddress(env Env, serviceName string, port int, protocol string) string {
+	prefix := fmt.Sprintf("%s_PORT_%d_%s",
+		strings.ToUpper(serviceName), port, protocol)
+	return fmt.Sprintf(
+		"%s:%s",
+		env.GetString(fmt.Sprintf("%s_ADDR", prefix)),
+		env.GetString(fmt.Sprintf("%s_PORT", prefix)),
+	)
+}
 func getenv(key string) string {
 	return os.Getenv(strings.ToUpper(key))
 }
@@ -43,6 +57,14 @@ func (*OsEnv) GetInt(key string) int64 {
 		panic("Could not parse " + key)
 	}
 	return val
+}
+
+func (e *OsEnv) GetTCPServiceAddress(name string, port int) string {
+	return makeDockerLinkAddress(e, name, port, "TCP")
+}
+
+func (e *OsEnv) GetUDPServiceAddress(name string, port int) string {
+	return makeDockerLinkAddress(e, name, port, "UDP")
 }
 
 func (e *OsEnv) InProd() bool {
@@ -81,6 +103,14 @@ func (e MapEnv) GetInt(key string) int64 {
 		panic("Could not get " + key + " as an int")
 	}
 	return n
+}
+
+func (e MapEnv) GetTCPServiceAddress(name string, port int) string {
+	return makeDockerLinkAddress(e, name, port, "TCP")
+}
+
+func (e MapEnv) GetUDPServiceAddress(name string, port int) string {
+	return makeDockerLinkAddress(e, name, port, "UDP")
 }
 
 func (e MapEnv) InProd() bool {
