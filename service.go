@@ -6,15 +6,18 @@ import (
 	"net/http"
 	"os"
 	"runtime"
+	"strings"
 
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 )
 
 type Service struct {
+	name   string
 	Router *mux.Router
 	Env    Env
 	Log    Log
+	Stats  Statter
 }
 
 // This serves as a health check and a default route just to make sure we're
@@ -44,8 +47,16 @@ func NewService(r *mux.Router) *Service {
 			service.NotFound(w)
 		})
 	}
+	fullPath := strings.Split(os.Args[0], "/")
+	name := fullPath[len(fullPath)-1]
 	// Default to OsEnv until we have more ways of doing configuration
-	service = &Service{Router: r, Env: NewOsEnv(), Log: NewStdLog()}
+	service = &Service{
+		name:   name,
+		Router: r,
+		Env:    NewOsEnv(),
+		Log:    NewStdLog(),
+	}
+	service.Stats = service.NewStatsd()
 	r.HandleFunc("/health", service.defaultHandler)
 	return service
 }
