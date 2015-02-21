@@ -39,7 +39,24 @@ func NewStdLog() *StdLog {
 	return &StdLog{
 		debug: log.New(os.Stdout, "DEBUG ", log.LstdFlags),
 		info:  log.New(os.Stdout, "INFO ", log.LstdFlags),
-		warn:  log.New(os.Stdout, "WARNING ", log.LstdFlags),
-		err:   log.New(os.Stdout, "ERROR ", log.LstdFlags),
+		warn:  log.New(os.Stdout, "WARNING ", log.LstdFlags|log.Lshortfile),
+		err:   log.New(os.Stdout, "ERROR ", log.LstdFlags|log.Lshortfile),
 	}
+}
+
+// Shortcuts to make logging from a service a little less verbose
+func (s *Service) Error(format string, v ...interface{}) {
+	s.Log.Error().Printf(format, v...)
+}
+
+func (s *Service) Warning(format string, v ...interface{}) {
+	s.Log.Warning().Printf(format, v...)
+}
+
+func (s *Service) Info(format string, v ...interface{}) {
+	s.Log.Info().Printf(format, v...)
+}
+
+func (s *Service) Debug(format string, v ...interface{}) {
+	s.Log.Debug().Printf(format, v...)
 }
