@@ -13,11 +13,18 @@ import (
 )
 
 type Service struct {
-	name   string
+	name string
+	// Use this to route HTTP requests to this service.
 	Router *mux.Router
-	Env    Env
-	Log    Log
-	Stats  Statter
+	// Represents the current environment the service is running in. The
+	// environment can be filled out in a number of ways, but services can
+	// always find the variables here.
+	Env Env
+	// A log helper with different levels of logging.
+	Log Log
+	// Record stats about your service here. Defaults to having a prefix
+	// that is the same as the service's binary name.
+	Stats Statter
 }
 
 // This serves as a health check and a default route just to make sure we're
