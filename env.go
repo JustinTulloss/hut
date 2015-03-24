@@ -12,6 +12,7 @@ type Env interface {
 	GetString(string) string
 	GetUint(string) uint64
 	GetInt(string) int64
+	GetBool(string) bool
 	GetTCPServiceAddress(string, int) string
 	GetUDPServiceAddress(string, int) string
 	MustGetTCPServiceAddress(string, int) string
@@ -58,6 +59,17 @@ func (*OsEnv) GetUint(key string) uint64 {
 
 func (*OsEnv) GetInt(key string) int64 {
 	val, err := strconv.ParseInt(getenv(key), 10, 64)
+	if err != nil {
+		panic("Could not parse " + key)
+	}
+	return val
+}
+
+func (*OsEnv) GetBool(key string) bool {
+	if getenv(key) == "" {
+		return false
+	}
+	val, err := strconv.ParseBool(getenv(key))
 	if err != nil {
 		panic("Could not parse " + key)
 	}
@@ -124,6 +136,14 @@ func (e MapEnv) GetInt(key string) int64 {
 		panic("Could not get " + key + " as an int")
 	}
 	return n
+}
+
+func (e MapEnv) GetBool(key string) bool {
+	b, ok := e[key].(bool)
+	if !ok {
+		return false
+	}
+	return b
 }
 
 func (e MapEnv) GetTCPServiceAddress(name string, port int) string {
