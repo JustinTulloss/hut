@@ -43,6 +43,13 @@ var _ = Describe("OsEnv", func() {
 		Expect(s.Env.GetInt("NUMBERS")).To(Equal(int64(5678)))
 		Expect(func() { s.Env.GetInt("TEST") }).To(Panic())
 	})
+	It("can get bools", func() {
+		Expect(s.Env.GetBool("NOTHERE")).To(Equal(false))
+		os.Setenv("HAPPENING", "true")
+		Expect(s.Env.GetBool("HAPPENING")).To(Equal(true))
+		os.Setenv("NOTHAPPENING", "false")
+		Expect(s.Env.GetBool("NOTHAPPENING")).To(Equal(false))
+	})
 	It("can compose a tcp service address", func() {
 		os.Setenv("SERVICE_PORT_1337_TCP_ADDR", "testerator")
 		os.Setenv("SERVICE_PORT_1337_TCP_PORT", "7")
