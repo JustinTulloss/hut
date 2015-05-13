@@ -37,10 +37,10 @@ func (l *StdLog) Error() *log.Logger {
 
 func NewStdLog() *StdLog {
 	return &StdLog{
-		debug: log.New(os.Stdout, "DEBUG ", log.LstdFlags),
-		info:  log.New(os.Stdout, "INFO ", log.LstdFlags),
-		warn:  log.New(os.Stdout, "WARNING ", log.LstdFlags|log.Lshortfile),
-		err:   log.New(os.Stdout, "ERROR ", log.LstdFlags|log.Lshortfile),
+		debug: log.New(os.Stdout, "DEBUG ", 0),
+		info:  log.New(os.Stdout, "INFO ", 0),
+		warn:  log.New(os.Stdout, "WARNING ", log.Lshortfile),
+		err:   log.New(os.Stdout, "ERROR ", log.Lshortfile),
 	}
 }
 
