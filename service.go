@@ -21,7 +21,7 @@ type Service struct {
 	// always find the variables here.
 	Env Env
 	// A log helper with different levels of logging.
-	Log Log
+	Log Logger
 	// Record stats about your service here. Defaults to having a prefix
 	// that is the same as the service's binary name.
 	Stats Statter
@@ -61,7 +61,7 @@ func NewService(r *mux.Router) *Service {
 		name:   name,
 		Router: r,
 		Env:    NewOsEnv(),
-		Log:    NewStdLog(),
+		Log:    NewLogxiLog(name),
 	}
 	service.Stats = service.NewStatsd()
 	r.HandleFunc("/health", service.defaultHandler)
